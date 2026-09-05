@@ -6,9 +6,15 @@ import json
 from app.utils.file_utils import extract_text_from_pdf, extract_text_from_docx
 
 load_dotenv()
-genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
-
-model = genai.GenerativeModel("gemini-2.5-flash-lite")
+api_key = os.getenv("GEMINI_API_KEY")
+model_name = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
+model = None
+if api_key:
+    try:
+        genai.configure(api_key=api_key)
+        model = genai.GenerativeModel(model_name)
+    except Exception as e:
+        model = None
 
 def _resume_fallback(score: int = 65, improvements: list[str] | None = None):
     return {
@@ -149,12 +155,16 @@ def _parse_resume_result(result_text: str):
     }
 
 def _analyze_resume_text(content: str):
+    if not model:
+        return _resume_fallback()
     response = model.generate_content(
         f"{_resume_prompt()}\n\nRESUME TEXT:\n{content[:12000]}"
     )
     return _parse_resume_result(response.text)
 
 def _analyze_resume_pdf(file_content: bytes, filename: str | None = None):
+    if not model:
+        return _resume_fallback()
     response = model.generate_content(
         [
             _resume_prompt(),
@@ -211,14 +221,15 @@ User Input:
     else:
         raise ValueError("Invalid category. Must be 'bio', 'experience', or 'skills'.")
 
-    result = model.generate_content(prompt)
-    # Take first 4 non-empty lines as final text
-    lines = [line.strip() for line in result.text.splitlines() if line.strip()]
-    return " ".join(lines[:4])  # single direct text
-
-
-
-
+    if model:
+        try:
+            result = model.generate_content(prompt)
+            lines = [line.strip() for line in result.text.splitlines() if line.strip()]
+            if lines:
+                return " ".join(lines[:4])
+        except Exception as e:
+            print(f"Error improving text: {e}")
+    return text
 
 async def analyze_resume_with_ai(file_content: bytes = None, filename: str = None, text: str = None):
     content_to_send = text

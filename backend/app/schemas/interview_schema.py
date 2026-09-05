@@ -1,5 +1,6 @@
-from typing import List, Optional
-from pydantic import BaseModel, UUID4
+from typing import List, Optional, Union
+from uuid import UUID
+from pydantic import BaseModel, field_validator
 from datetime import datetime
 
 class InterviewCreate(BaseModel):
@@ -14,7 +15,7 @@ class InterviewCreate(BaseModel):
     companies: Optional[List[str]] = None
 
 class InterviewResponse(BaseModel):
-    id: UUID4
+    id: Union[UUID, str]
     domain: str
     sub_domain: Optional[str] = None
     difficulty: str
@@ -27,6 +28,20 @@ class InterviewResponse(BaseModel):
     is_active: bool
     created_at: datetime
 
+    @field_validator("tags", mode="before")
+    @classmethod
+    def parse_tags(cls, v):
+        if not v:
+            return []
+        if isinstance(v, list):
+            return v
+        if isinstance(v, str):
+            v_clean = v.strip("{}[] \t\r\n")
+            if not v_clean:
+                return []
+            return [t.strip().strip('"\'') for t in v_clean.split(",") if t.strip()]
+        return []
+
     class Config:
         from_attributes = True
 
@@ -36,9 +51,9 @@ class InterviewProgressUpdate(BaseModel):
     student_notes: Optional[str] = None
 
 class InterviewProgressResponse(BaseModel):
-    id: UUID4
-    student_id: UUID4
-    question_id: UUID4
+    id: Union[UUID, str]
+    student_id: Union[UUID, str]
+    question_id: Union[UUID, str]
     status: str
     student_notes: Optional[str] = None
     ai_answer_generated: bool

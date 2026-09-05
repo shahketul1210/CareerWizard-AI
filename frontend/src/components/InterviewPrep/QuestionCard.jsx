@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeContext } from '../../context/ThemeContext';
 import { StickyNoteIcon, SparklesIcon, CodeIcon, ChevronDownIcon, CheckIcon, CheckCircleIcon } from '../ui/Icons';
+import { formatInterviewExplanation, renderGeneralMarkdown } from '../../utils/markdownRenderer';
 
 const AnimatedCheck = ({ checked, isDark }) => {
     return (
@@ -210,16 +211,16 @@ const QuestionCard = ({ question, toggleComplete, currentNote, onSaveNote, onExp
                                 {showAnswer && (
                                     <div className="space-y-4 pb-2">
                                         {question.ai_explanation && (
-                                            <div className={`space-y-2 border-l-2 border-black/30 dark:border-white/30 p-4 rounded-r-lg ${
-                                                isDark ? 'bg-white/[0.01]' : 'bg-slate-50'
+                                            <div className={`space-y-3 border-l-2 border-amber-500/50 dark:border-amber-400/50 p-4 md:p-5 rounded-r-xl transition-all ${
+                                                isDark ? 'bg-white/[0.015] border-white/[0.04]' : 'bg-amber-500/[0.02] border-amber-500/10 shadow-xs'
                                             }`}>
-                                                <div className="flex items-center gap-2.5">
-                                                    <SparklesIcon size={9} className="text-black dark:text-white" />
-                                                    <span className="text-[9px] font-black uppercase tracking-[0.5em]">AI Explain:</span>
+                                                <div className="flex items-center gap-2 pb-1 border-b border-black/[0.05] dark:border-white/[0.06]">
+                                                    <SparklesIcon size={11} className="text-amber-500 dark:text-amber-400" />
+                                                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-amber-600 dark:text-amber-400">AI Explanation:</span>
                                                 </div>
                                                 <div
-                                                    className="text-[var(--text-muted)] text-xs leading-relaxed prose max-w-none font-medium"
-                                                    dangerouslySetInnerHTML={{ __html: question.ai_explanation }}
+                                                    className="ai-markdown-content text-xs leading-relaxed font-normal"
+                                                    dangerouslySetInnerHTML={{ __html: formatInterviewExplanation(question.ai_explanation) }}
                                                 />
                                             </div>
                                         )}
@@ -233,8 +234,8 @@ const QuestionCard = ({ question, toggleComplete, currentNote, onSaveNote, onExp
                                                 isDark ? 'bg-[#040404] border-white/[0.02]' : 'bg-white border-[var(--gold)]/20 shadow-sm'
                                             }`}>
                                                 <div
-                                                    className="text-[var(--text-main)] text-[15px] leading-[1.7] prose max-w-none p-4 md:p-6 font-medium border-b border-white/[0.01]"
-                                                    dangerouslySetInnerHTML={{ __html: question.answer.explanation }}
+                                                    className="ai-markdown-content text-[var(--text-main)] text-[14px] md:text-[15px] leading-[1.75] p-4 md:p-6 font-normal border-b border-white/[0.01]"
+                                                    dangerouslySetInnerHTML={{ __html: renderGeneralMarkdown(question.answer.explanation) }}
                                                 />
                                                 {formattedCode && (
                                                     <div className={`p-4 md:p-5 border-t ${

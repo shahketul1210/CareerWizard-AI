@@ -22,6 +22,70 @@ const JobCard = ({ job }) => {
   const description = job.description || "";
   const isLongDescription = description.length > 150;
 
+  const getApplyUrl = () => {
+    const rawLink = (job.apply_link || job.url || job.job_apply_link || "").trim();
+    if (rawLink && rawLink !== '#' && (rawLink.startsWith('http://') || rawLink.startsWith('https://'))) {
+      return rawLink;
+    }
+    
+    const company = (job.company || "").trim();
+    const title = (job.title || "").trim();
+    const location = (job.location || "").trim();
+    const companyLower = company.toLowerCase();
+    const encodedTitle = encodeURIComponent(title || "Software Engineer");
+
+    if (companyLower.includes("microsoft")) {
+      return `https://careers.microsoft.com/us/en/search-results?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("google")) {
+      return `https://www.google.com/about/careers/applications/jobs/results/?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("amazon")) {
+      return `https://www.amazon.jobs/en/search?base_query=${encodedTitle}`;
+    }
+    if (companyLower.includes("meta") || companyLower.includes("facebook")) {
+      return `https://www.metacareers.com/jobs?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("apple")) {
+      return `https://jobs.apple.com/en-us/search?search=${encodedTitle}`;
+    }
+    if (companyLower.includes("netflix")) {
+      return `https://jobs.netflix.com/search?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("stability")) {
+      return `https://stability.ai/careers`;
+    }
+    if (companyLower.includes("openai")) {
+      return `https://openai.com/careers/search?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("flipkart")) {
+      return `https://www.flipkartcareers.com/#!/searchjobs`;
+    }
+    if (companyLower.includes("zomato")) {
+      return `https://www.zomato.com/careers`;
+    }
+    if (companyLower.includes("spotify")) {
+      return `https://www.lifeatspotify.com/jobs?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("stripe")) {
+      return `https://stripe.com/jobs/search?query=${encodedTitle}`;
+    }
+    if (companyLower.includes("nvidia")) {
+      return `https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("salesforce")) {
+      return `https://salesforce.wd1.myworkdayjobs.com/External_Career_Site?q=${encodedTitle}`;
+    }
+    if (companyLower.includes("adobe")) {
+      return `https://careers.adobe.com/us/en/search-results?keywords=${encodedTitle}`;
+    }
+
+    const searchQuery = [title, company].filter(Boolean).join(" ");
+    return `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchQuery || "Software Engineer")}${location ? `&location=${encodeURIComponent(location)}` : ''}`;
+  };
+
+  const applyUrl = getApplyUrl();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -104,10 +168,17 @@ const JobCard = ({ job }) => {
         </div>
 
         <a 
-          href={job.apply_link || "#"} 
+          href={applyUrl} 
           target="_blank" 
           rel="noopener noreferrer"
-          className={`w-full lg:w-auto px-8 h-11 text-[14px] font-bold rounded-xl transition-all duration-700 shadow-md shrink-0 flex items-center justify-center decoration-0 no-underline ${
+          onClick={(e) => {
+            if (!applyUrl || applyUrl === "#") {
+              e.preventDefault();
+              const fallback = `https://www.google.com/search?ibp=htl;jobs&q=${encodeURIComponent(`${job.title || ''} ${job.company || ''} jobs`)}`;
+              window.open(fallback, '_blank', 'noopener,noreferrer');
+            }
+          }}
+          className={`w-full lg:w-auto px-8 h-11 text-[14px] font-bold rounded-xl transition-all duration-700 shadow-md shrink-0 flex items-center justify-center decoration-0 no-underline cursor-pointer ${
             isDark
               ? 'bg-white text-black hover:bg-cyan-400 hover:shadow-[0_10px_25px_-5px_rgba(34,211,238,0.3)]'
               : 'bg-[#0f172a] text-white hover:bg-[#16a34a] hover:shadow-[0_10px_25px_-5px_rgba(22,163,74,0.3)]'

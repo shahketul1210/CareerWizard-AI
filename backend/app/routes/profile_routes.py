@@ -32,17 +32,22 @@ def get_profile(current_user=Depends(get_current_user), db: Session = Depends(ge
             "resume_file_path": ""
         }
 
+    skills_val = profile.skills
+    if isinstance(skills_val, list):
+        skills_str = ", ".join(skills_val)
+    else:
+        skills_str = str(skills_val or "")
+
     return {
         "name": current_user.full_name,
         "email": current_user.email,
         "location": profile.location,
-        "bio": profile.bio,
+        "bio": profile.bio or "",
         "experience": profile.experience,
-        "skills": profile.skills,
+        "skills": skills_str,
         "linkedin_url": profile.linkedin_url,
         "target_roles": profile.get_roles(),
         "resume_file_path": os.path.basename(profile.resume_file_path) if profile.resume_file_path else ""
-
     }
 
 
@@ -69,11 +74,16 @@ def update_profile(
         db.add(profile)
 
     # Update simple fields
-    profile.location = location
-    profile.bio = bio
-    profile.experience = experience
-    profile.skills = skills
-    profile.linkedin_url = linkedin_url
+    if location is not None:
+        profile.location = location
+    if bio is not None:
+        profile.bio = bio
+    if experience is not None:
+        profile.experience = experience
+    if skills is not None:
+        profile.skills = [s.strip() for s in skills.split(",") if s.strip()] if isinstance(skills, str) else skills
+    if linkedin_url is not None:
+        profile.linkedin_url = linkedin_url
 
     # Handle target roles
     if target_roles:
@@ -109,15 +119,17 @@ def update_profile(
     db.add(activity)
     db.commit()
 
+    skills_ret = ", ".join(profile.skills) if isinstance(profile.skills, list) else str(profile.skills or "")
+
     return {
         "message": "Profile updated successfully",
         "profile": {
             "name": current_user.full_name,
             "email": current_user.email,
             "location": profile.location,
-            "bio": profile.bio,
+            "bio": profile.bio or "",
             "experience": profile.experience,
-            "skills": profile.skills,
+            "skills": skills_ret,
             "linkedin_url": profile.linkedin_url,
             "target_roles": profile.get_roles(),
             "resume_file_path": os.path.basename(profile.resume_file_path) if profile.resume_file_path else ""

@@ -8,8 +8,12 @@ load_dotenv()
 
 # Configure Gemini API
 api_key = os.getenv("GEMINI_API_KEY")
-genai.configure(api_key=api_key)
-MODEL_NAME = "models/gemini-2.5-flash"
+if api_key:
+    try:
+        genai.configure(api_key=api_key)
+    except Exception:
+        pass
+MODEL_NAME = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 
 
 

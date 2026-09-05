@@ -26,3 +26,60 @@ class StudentProfile(Base):
     updated_at = Column(DateTime(timezone=True), default=func.now(), server_default=func.now(), onupdate=func.now(), nullable=False)
 
     user = relationship("User", back_populates="profile")
+
+    @property
+    def location(self):
+        return self.city or ""
+
+    @location.setter
+    def location(self, val):
+        self.city = val
+
+    @property
+    def experience(self):
+        return str(self.experience_years or "")
+
+    @experience.setter
+    def experience(self, val):
+        try:
+            self.experience_years = float(val) if val else 0.0
+        except (ValueError, TypeError):
+            self.experience_years = 0.0
+
+    @property
+    def linkedin_url(self):
+        return self.user.linkedin_url if self.user else ""
+
+    @linkedin_url.setter
+    def linkedin_url(self, val):
+        if self.user:
+            self.user.linkedin_url = val
+
+    @property
+    def resume_file_path(self):
+        return self.resume_url or ""
+
+    @resume_file_path.setter
+    def resume_file_path(self, val):
+        self.resume_url = val
+
+    def get_roles(self):
+        if not self.target_role:
+            return []
+        if isinstance(self.target_role, list):
+            return self.target_role
+        try:
+            import json
+            parsed = json.loads(self.target_role)
+            if isinstance(parsed, list):
+                return parsed
+        except Exception:
+            pass
+        return [self.target_role]
+
+    def set_roles(self, roles):
+        if isinstance(roles, list):
+            import json
+            self.target_role = json.dumps(roles)
+        else:
+            self.target_role = str(roles)

@@ -412,3 +412,101 @@ html.light .input-glass {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ─── AI MARKDOWN CONTENT STYLING ─── */
+.ai-markdown-content {
+  color: var(--text-main);
+  line-height: 1.7;
+}
+
+.ai-markdown-content p {
+  margin-top: 0.45rem;
+  margin-bottom: 0.65rem;
+  color: var(--text-muted);
+}
+
+.ai-markdown-content strong {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.ai-markdown-content em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.ai-markdown-content ol {
+  list-style-type: decimal;
+  padding-left: 1.35rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.ai-markdown-content ul {
+  list-style-type: disc;
+  padding-left: 1.35rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ai-markdown-content li {
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.ai-markdown-content li strong {
+  color: var(--text-main);
+}
+
+.ai-markdown-content pre {
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.6rem;
+  background-color: #050507;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.825rem;
+  line-height: 1.6;
+}
+html.light .ai-markdown-content pre {
+  background-color: #f7f4ec;
+  border: 1px solid rgba(160, 120, 64, 0.2);
+}
+
+.ai-markdown-content code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--gold-light);
+}
+html.light .ai-markdown-content code {
+  background-color: rgba(160, 120, 64, 0.08);
+  color: var(--gold-dark);
+}
+
+.ai-markdown-content pre code {
+  background: transparent;
+  padding: 0;
+  color: #e2e8f0;
+}
+html.light .ai-markdown-content pre code {
+  color: #1e293b;
+}
+
+.ai-markdown-content blockquote {
+  border-left: 3px solid var(--gold);
+  padding-left: 0.75rem;
+  margin: 0.75rem 0;
+  font-style: italic;
+  color: var(--text-muted);
+}

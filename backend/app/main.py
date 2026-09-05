@@ -36,7 +36,9 @@ origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
-    "http://127.0.0.1:5174"
+    "http://127.0.0.1:5174",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
 
 app.add_middleware(
@@ -52,6 +54,11 @@ app.add_middleware(
 def startup():
     try:
         Base.metadata.create_all(bind=engine)
+        try:
+            from seed_data import seed_database
+            seed_database(force=False)
+        except Exception as seed_err:
+            logger.warning(f"Auto-seed check note: {seed_err}")
         logger.info("Database schema check completed")
     except SQLAlchemyError as error:
         logger.exception("Database schema initialization failed: %s", error)

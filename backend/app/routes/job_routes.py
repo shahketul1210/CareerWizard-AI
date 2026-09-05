@@ -18,6 +18,52 @@ router = APIRouter(prefix="/jobs", tags=["jobs"])
 
 # GET ALL JOBS (DEFAULT WHEN NO RESUME UPLOADED)
 
+import urllib.parse
+
+def resolve_apply_link(j) -> str:
+    link = getattr(j, "apply_link", None) if not isinstance(j, dict) else j.get("apply_link")
+    if link and str(link).strip() and str(link).strip() != "#" and str(link).startswith("http"):
+        return str(link).strip()
+    
+    title = (getattr(j, "title", "") if not isinstance(j, dict) else j.get("title", "")) or ""
+    company = (getattr(j, "company", "") if not isinstance(j, dict) else j.get("company", "")) or ""
+    c_lower = company.lower()
+    t_encoded = urllib.parse.quote(title or "Software Engineer")
+
+    if "microsoft" in c_lower:
+        return f"https://careers.microsoft.com/us/en/search-results?q={t_encoded}"
+    elif "google" in c_lower:
+        return f"https://www.google.com/about/careers/applications/jobs/results/?q={t_encoded}"
+    elif "amazon" in c_lower:
+        return f"https://www.amazon.jobs/en/search?base_query={t_encoded}"
+    elif "meta" in c_lower or "facebook" in c_lower:
+        return f"https://www.metacareers.com/jobs?q={t_encoded}"
+    elif "apple" in c_lower:
+        return f"https://jobs.apple.com/en-us/search?search={t_encoded}"
+    elif "netflix" in c_lower:
+        return f"https://jobs.netflix.com/search?q={t_encoded}"
+    elif "stability" in c_lower:
+        return "https://stability.ai/careers"
+    elif "openai" in c_lower:
+        return f"https://openai.com/careers/search?q={t_encoded}"
+    elif "flipkart" in c_lower:
+        return "https://www.flipkartcareers.com/#!/searchjobs"
+    elif "zomato" in c_lower:
+        return "https://www.zomato.com/careers"
+    elif "spotify" in c_lower:
+        return f"https://www.lifeatspotify.com/jobs?q={t_encoded}"
+    elif "stripe" in c_lower:
+        return f"https://stripe.com/jobs/search?query={t_encoded}"
+    elif "nvidia" in c_lower:
+        return f"https://nvidia.wd5.myworkdayjobs.com/NVIDIAExternalCareerSite?q={t_encoded}"
+    elif "salesforce" in c_lower:
+        return f"https://salesforce.wd1.myworkdayjobs.com/External_Career_Site?q={t_encoded}"
+    elif "adobe" in c_lower:
+        return f"https://careers.adobe.com/us/en/search-results?keywords={t_encoded}"
+
+    q_enc = urllib.parse.quote(f"{title} {company}".strip() or "Software Engineer")
+    return f"https://www.linkedin.com/jobs/search/?keywords={q_enc}"
+
 @router.get("/all", response_model=List[JobOut])
 def get_all_jobs(db: Session = Depends(get_db)):
     jobs = db.query(Job).all()
@@ -32,7 +78,7 @@ def get_all_jobs(db: Session = Depends(get_db)):
             type=j.type,
             description=j.description,
             posted=j.posted,
-            apply_link=getattr(j, "apply_link", "#") or "#",
+            apply_link=resolve_apply_link(j),
             is_api=getattr(j, "is_api", False),
             created_at=str(j.created_at) if getattr(j, "created_at", None) else None,
             required_skills=[s.name for s in j.required_skills]
@@ -93,7 +139,7 @@ async def match_jobs_with_resume(
             type=j.type,
             description=j.description,
             posted=j.posted,
-            apply_link=getattr(j, "apply_link", "#") or "#",
+            apply_link=resolve_apply_link(j),
             is_api=getattr(j, "is_api", False),
             created_at=str(j.created_at) if getattr(j, "created_at", None) else None,
             required_skills=[s.name for s in j.required_skills]

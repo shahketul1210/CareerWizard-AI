@@ -21,6 +21,7 @@ class Settings:
         return db_url
 
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY")
+    GEMINI_MODEL: str = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
     SECRET_KEY: str = os.getenv("SECRET_KEY", "ultra_secret_carrier_wizard_key_2024")
     SUPABASE_URL: str = os.getenv("SUPABASE_URL")
     SUPABASE_KEY: str = os.getenv("SUPABASE_KEY")

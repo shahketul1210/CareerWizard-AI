@@ -139,7 +139,7 @@ const InterviewPrepOutlet = () => {
 
         try {
             const text = await generateAIExplanation(selectedRole, question.title, question.answer.explanation);
-            const formatted = text ? text.replace(/\n/g, '<br />') : 'Failed to generate explanation. Please try again.';
+            const formatted = text || 'Failed to generate explanation. Please try again.';
 
             setAllAIExplanations(prev => ({
                 ...prev,
