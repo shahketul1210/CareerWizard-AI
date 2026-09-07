@@ -16,6 +16,7 @@ import JobMatchOutlet from "./components/JobMatchOutlet";
 import SkillGapOutlet from "./components/SkillGapOutlet";
 import InterviewPrepOutlet from "./components/InterviewPrepOutlet";
 import CareerRoadmapOutlet from "./components/CareerRoadmapOutlet";
+import InterviewCopilotOutlet from "./components/InterviewCopilotOutlet";
 import Admintaskpage from "./pages/internship/Admintaskpage";
 import CertificateView from "./pages/CertificateView";
 
@@ -55,6 +56,14 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/interview-copilot"
+          element={
+            <div className="pt-16">
+              <InterviewCopilotOutlet />
+            </div>
+          }
+        />
 
         <Route
           path="/profile"
@@ -99,6 +108,7 @@ export default function App() {
             <Route path="career-roadmap" element={<CareerRoadmapOutlet />} />
             <Route path="skills-gap" element={<SkillGapOutlet />} />
             <Route path="interview-prep" element={<InterviewPrepOutlet />} />
+            <Route path="interview-copilot" element={<InterviewCopilotOutlet />} />
           </Route>
 
           {/* INTERNSHIP PORTAL SYSTEM (ACCESSIBLE VIA /internship) */}

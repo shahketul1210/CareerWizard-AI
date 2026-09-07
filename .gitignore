@@ -32,21 +32,7 @@ __pycache__/
 **/__pycache__/
 *.py[cod]
 
-# ==========================================
-# 🚀 COMMANDS TO RUN PROJECT (QUICK REMINDER)
-# ==========================================
-#
-# 1) BACKEND RUN KARNE KE LIYE:
-#    cd backend
-#    .\venv\Scripts\activate
-#    uvicorn app.main:app --reload
-#    (ya: python -m uvicorn app.main:app --reload)
-#    --> Backend API: http://127.0.0.1:8000
-#    --> Swagger Docs: http://127.0.0.1:8000/docs
-#
-# 2) FRONTEND RUN KARNE KE LIYE:
-#    cd frontend
-#    npm run dev
-#    --> Frontend App: http://localhost:5173
-# ==========================================
-
+# Run Backend: cd backend && .\venv\Scripts\activate && uvicorn main:app --reload
+# Run Frontend: cd frontend && npm run dev
+# Backend URL:  http://127.0.0.1:8000 (Docs: /docs)
+# Frontend URL: http://localhost:5173

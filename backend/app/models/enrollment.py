@@ -13,7 +13,7 @@ class Enrollment(Base):
     track_id = Column(UUID(as_uuid=True), ForeignKey("internship_tracks.id", ondelete="CASCADE"), nullable=False)
     difficulty_level = Column(String(20), nullable=False)
     status = Column(String(20), default="active", server_default="active", nullable=False)
-    payment_id = Column(UUID(as_uuid=True), ForeignKey("payments.id", ondelete="CASCADE"), nullable=False)
+    payment_id = Column(UUID(as_uuid=True), ForeignKey("payments.id", ondelete="CASCADE"), nullable=True)
     current_day = Column(SmallInteger, default=1, server_default="1", nullable=False)
     current_phase = Column(SmallInteger, default=1, server_default="1", nullable=False)
     total_days = Column(SmallInteger, nullable=False)

@@ -25,7 +25,8 @@ import {
     CreditCardIcon,
     IdentificationIcon,
     CheckBadgeIcon,
-    ShieldCheckIcon
+    ShieldCheckIcon,
+    MicrophoneIcon
 } from "@heroicons/react/24/outline";
 
 import {
@@ -39,6 +40,7 @@ const tabs = [
     { name: "Overview", path: "/overview", icon: ChartBarIcon },
     { name: "My Internship", path: "/internship", icon: RocketLaunchIcon, hasSubmenu: true },
     { name: "Create Task", path: "/admin", icon: ClipboardDocumentListIcon, hasSubmenu: true, adminOnly: true },
+    { name: "Interview Copilot", path: "/overview/interview-copilot", icon: MicrophoneIcon, badge: "AI" },
     { name: "Analysis", path: "/overview/resume-analysis", icon: DocumentMagnifyingGlassIcon },
     { name: "Jobs", path: "/overview/job-match", icon: BriefcaseIcon },
     { name: "Skills", path: "/overview/skills-gap", icon: AcademicCapIcon },
@@ -84,13 +86,17 @@ const Overview = () => {
     const scrollRef = useRef(null);
     const location = useLocation();
     const navigate = useNavigate();
-    const { logout, user } = useContext(AuthContext);
+    const { logout, user, profile } = useContext(AuthContext);
     const { theme, toggleTheme, isDark } = useContext(ThemeContext);
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const dropdownRef = useRef(null);
     const isAdminView = location.pathname === '/admin';
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+
+    const displayName = user?.name || user?.full_name || profile?.name || 'User';
+    const initialLetter = displayName.trim() ? displayName.trim()[0].toUpperCase() : 'U';
+    const userSubtitle = profile?.headline || (user?.email ? user.email : 'Pro Member');
 
     const isInternshipRoute = location.pathname.startsWith('/internship');
     const isAdminRoute = location.pathname.startsWith('/admin');
@@ -276,6 +282,12 @@ const Overview = () => {
                                             >
                                                 {tab.name}
                                             </motion.span>
+                                        )}
+
+                                        {!isCollapsed && tab.badge && (
+                                            <span className={`ml-auto px-1.5 py-0.5 rounded-md text-[9px] font-black tracking-wider uppercase ${isDark ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20' : 'bg-[var(--gold)]/15 text-[var(--gold-dark)] border border-[var(--gold)]/30'}`}>
+                                                {tab.badge}
+                                            </span>
                                         )}
 
                                         {!isCollapsed && tab.hasSubmenu && (
@@ -530,13 +542,13 @@ const Overview = () => {
                             {/* COMPACT USER CARD ROW */}
                             <div className="flex items-center gap-3 p-2 rounded-xl bg-[var(--gold)]/5 border border-[var(--gold)]/10">
                                 <div className="w-9 h-9 rounded-full border-2 border-[var(--gold)]/30 bg-[var(--gold-dark)] text-white flex items-center justify-center font-bold text-base shrink-0 shadow-[0_0_10px_rgba(160,120,64,0.2)]">
-                                    H
+                                    {initialLetter}
                                 </div>
 
                                 {/* NAME & SUBTITLE */}
                                 <div className="min-w-0 flex-1">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="text-[13px] font-bold text-[var(--text-main)] truncate">Het Panchal</span>
+                                        <span className="text-[13px] font-bold text-[var(--text-main)] truncate">{displayName}</span>
                                         {isAdminView && (
                                             <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${isDark
                                                 ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
@@ -544,7 +556,7 @@ const Overview = () => {
                                                 }`}>Admin</span>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-slate-400 font-medium truncate">Pro · CE Final Year</p>
+                                    <p className="text-[10px] text-slate-400 font-medium truncate">{userSubtitle}</p>
                                 </div>
 
                                 {/* SETTINGS TOGGLE BUTTON */}
@@ -596,7 +608,7 @@ const Overview = () => {
                                             }`}
                                     >
                                         <div className="border-b border-slate-500/10 pb-2 flex items-center justify-between">
-                                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">Het Panchal</span>
+                                            <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-slate-400">{displayName}</span>
                                             {isAdminView && (
                                                 <span className={`px-1.5 py-0.5 rounded text-[8px] font-bold uppercase tracking-wider ${isDark
                                                     ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
@@ -676,7 +688,7 @@ const Overview = () => {
                                 onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                                 className="w-10 h-10 rounded-full border-2 border-[var(--gold)]/30 bg-[var(--gold-dark)] text-white flex items-center justify-center font-bold text-lg cursor-pointer shadow-[0_0_12px_rgba(160,120,64,0.3)] hover:scale-105 transition-all relative"
                             >
-                                H
+                                {initialLetter}
                                 {isAdminView && (
                                     <div className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 rounded-full bg-emerald-500 border border-[var(--bg-sidebar)]" />
                                 )}

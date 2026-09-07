@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useLocation, useParams } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext';
+import internshipApi from '../api/internshipApi';
 import './CertificateView.css';
 
 export default function CertificateView() {
+  const { user } = useContext(AuthContext);
   const { certificateId } = useParams();
   const location = useLocation();
 
@@ -17,16 +20,16 @@ export default function CertificateView() {
   const initialCertificate = location.state?.certificate || storedCertificate;
 
   const [certData, setCertData] = useState({
-    name: initialCertificate?.name || 'Het Panchal',
-    role: 'Full-Stack Development Track',
-    days: '30',
-    start: 'May 1, 2025',
-    end: 'May 30, 2025',
-    certid: certificateId || 'CW-2025-INT-0047',
-    score: '9.2',
-    tasks: '24/25',
+    name: initialCertificate?.name || user?.name || user?.full_name || 'Candidate',
+    role: 'AI / ML Engineering Track',
+    days: '15',
+    start: 'Jan 1, 2025',
+    end: 'Jan 15, 2025',
+    certid: certificateId || 'CW-2025-AIML-00312',
+    score: '8.9',
+    tasks: '15/15',
     grade: 'A+',
-    programTitle: 'Professional Internship Program',
+    programTitle: 'AI / ML Engineering Professional Internship',
     verified: true,
     blockchain: true,
   });
@@ -43,6 +46,16 @@ export default function CertificateView() {
         ...prev,
         certid: certificateId,
       }));
+    }
+
+    if (certificateId) {
+      internshipApi.getCertificateDetail(certificateId)
+        .then(res => {
+          if (res) setCertData(prev => ({ ...prev, ...res }));
+        })
+        .catch(err => {
+          // graceful fallback
+        });
     }
   }, [initialCertificate, certificateId]);
 

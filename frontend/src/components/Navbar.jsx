@@ -65,6 +65,7 @@ export default function Navbar() {
         <div className="flex items-center space-x-8">
           {!isLoggedIn ? (
             <div className="flex items-center space-x-8">
+              <Link to="/interview-copilot" className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>AI Interview</Link>
               <Link to="/login" className={`text-[10px] font-black uppercase tracking-[0.2em] ${isDark ? 'text-slate-400 hover:text-white' : 'text-slate-600 hover:text-slate-900'} transition-colors`}>Login</Link>
               <Link to="/signup" className={`px-6 py-2.5 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:translate-y-[-2px] shadow-2xl ${
                 isDark 
@@ -76,6 +77,7 @@ export default function Navbar() {
             </div>
           ) : (
             <div className="flex items-center space-x-6">
+              <Link to="/interview-copilot" className={`hidden md:block text-xs font-bold tracking-widest ${isDark ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-emerald-600'} transition-colors uppercase`}>AI Interview</Link>
               <Link to="/internship" className={`hidden md:block text-xs font-bold tracking-widest ${isDark ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-emerald-600'} transition-colors uppercase`}>My Internship</Link>
               <Link to="/overview" className={`hidden md:block text-xs font-bold tracking-widest ${isDark ? 'text-slate-400 hover:text-cyan-400' : 'text-slate-600 hover:text-emerald-600'} transition-colors uppercase`}>System Dashboard</Link>
 
@@ -94,6 +96,7 @@ export default function Navbar() {
                       <p className="text-[10px] text-slate-500 uppercase tracking-widest font-black">Logged in as</p>
                       <p className={`text-sm font-bold truncate ${isDark ? 'text-white' : 'text-slate-900'}`}>{user?.name || 'System User'}</p>
                     </div>
+                    <button onClick={() => { navigate("/interview-copilot"); setIsDropdownOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-cyan-400' : 'text-slate-700 hover:bg-black/5 hover:text-emerald-600'}`}>AI Interview Copilot</button>
                     <button onClick={() => { navigate("/profile"); setIsDropdownOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-cyan-400' : 'text-slate-700 hover:bg-black/5 hover:text-emerald-600'}`}>Account Config</button>
                     <button onClick={() => { navigate("/internship"); setIsDropdownOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-cyan-400' : 'text-slate-700 hover:bg-black/5 hover:text-emerald-600'}`}>My Internship</button>
                     <button onClick={() => { navigate("/overview"); setIsDropdownOpen(false); }} className={`w-full text-left px-4 py-2.5 text-sm transition-colors ${isDark ? 'text-slate-300 hover:bg-white/5 hover:text-cyan-400' : 'text-slate-700 hover:bg-black/5 hover:text-emerald-600'}`}>Core Interface</button>

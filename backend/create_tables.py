@@ -20,6 +20,9 @@ from app.models.payment import *
 from app.models.enrollment import *
 from app.models.task_submission import *
 from app.models.certificate import *
+from app.models.day_content import *
+from app.models.internship_project import *
+from app.models.internship_note import *
 
 def main():
     print("Creating tables in Supabase Postgres...")

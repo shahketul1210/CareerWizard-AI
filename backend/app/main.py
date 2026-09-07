@@ -13,6 +13,8 @@ from app.routes.roadmap_routes import router as roadmap_router
 from app.routes.interview_routes import router as interview_router
 from app.routes.dashboard_routes import router as dashboard_router
 from app.routes.admin_internship_routes import router as admin_internship_router
+from app.routes.internship_routes import router as internship_router
+from app.routes.interview_copilot_routes import router as interview_copilot_router
 from app.models.activity import UserActivity
 from app.models.roadmap import SkillProgress
 from app.models.user import User
@@ -27,6 +29,9 @@ from app.models.task_submission import TaskSubmission
 from app.models.certificate import Certificate
 from app.models.interview import InterviewQuestion, InterviewProgress
 from app.models.day_content import DayContent
+from app.models.internship_project import InternshipProject
+from app.models.internship_note import InternshipNote
+from app.models.interview_copilot import InterviewCopilotSession, InterviewCopilotMessage
 
 logger = logging.getLogger(__name__)
 
@@ -77,3 +82,5 @@ app.include_router(roadmap_router)
 app.include_router(interview_router)
 app.include_router(dashboard_router)
 app.include_router(admin_internship_router)
+app.include_router(internship_router)
+app.include_router(interview_copilot_router)

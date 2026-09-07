@@ -1,38 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import internshipApi from '../../api/internshipApi';
 
 const plans = [
   { id: 'course', name: 'Course Certificate', price: 199, duration: 'Self-paced course', popular: false, features: ['Video lessons + quizzes', 'Course completion letter', 'No GitHub tasks', 'No AI code review'] },
-  { id: '15day', name: '15-Day Internship', price: 399, duration: '15 Days', popular: false, features: ['5 real project tasks', 'AI GitHub code review', 'Verified certificate', 'Own project option ✨'] },
-  { id: '30day', name: '30-Day Internship', price: 599, duration: '30 Days', popular: true, tag: 'Most Popular', features: ['6 phased project tasks', 'AI + human spot review', 'Blockchain certificate', 'Own project option ✨'] },
-  { id: '45day', name: '45-Day Internship', price: 999, duration: '45 Days', popular: false, features: ['9 advanced tasks', 'Priority AI review', 'Premium certificate', 'Job match boost'] },
+  { id: '15day', name: '15-Day Internship', price: 399, duration: '15 Days', popular: true, tag: 'Most Popular', features: ['15 real project tasks', 'AI GitHub code review', 'Verified certificate', 'Own project option ✨'] },
+  { id: '30day', name: '30-Day Internship', price: 599, duration: '30 Days', popular: false, features: ['30 phased project tasks', 'AI + mentor review', 'Blockchain certificate', 'Own project option ✨'] },
+  { id: '45day', name: '45-Day Internship', price: 999, duration: '45 Days', popular: false, features: ['45 advanced tasks', 'Priority AI review', 'Premium certificate', 'Job match boost'] },
   { id: '3month', name: '3-Month Internship', price: 1899, duration: '90 Days', popular: false, features: ['12 real-world tasks', 'Mentor review sessions', 'Gold certificate', 'Company referrals'] },
   { id: '6month', name: '6-Month Internship', price: 3599, duration: '180 Days', popular: false, features: ['15 enterprise tasks', '1:1 mentor calls', 'Platinum certificate', 'Guaranteed interview'] }
 ];
 
 const tracks = [
+  { id: 'aiml', name: 'AI / ML Engineering', icon: 'fa-brain', desc: 'PyTorch, NLP, Computer Vision, deployment' },
   { id: 'webdev', name: 'Web Development', icon: 'fa-code', desc: 'React, Node.js, REST APIs, databases' },
   { id: 'ds', name: 'Data Science', icon: 'fa-chart-simple', desc: 'Python, Pandas, ML models, visualization' },
-  { id: 'aiml', name: 'AI / ML Engineering', icon: 'fa-brain', desc: 'PyTorch, NLP, Computer Vision, deployment' },
   { id: 'uiux', name: 'UI / UX Design', icon: 'fa-pen-ruler', desc: 'Figma, wireframing, prototyping, research' },
   { id: 'devops', name: 'DevOps & Cloud', icon: 'fa-server', desc: 'Docker, AWS basics, CI/CD pipelines' },
   { id: 'pm', name: 'Product Management', icon: 'fa-clipboard-list', desc: 'PRDs, user stories, roadmaps, metrics' }
 ];
 
 const levels = [
-  { id: 'beginner', name: 'Beginner', difficulty: 'Easy', color: '#22c55e', desc: 'HTML, CSS, vanilla JS. No prior experience needed.', experience: '0 - 6 months experience' },
-  { id: 'intermediate', name: 'Intermediate', difficulty: 'Recommended', color: '#f59e0b', desc: 'React + backend + database. Build full-stack apps.', experience: '6 months - 2 years' },
-  { id: 'advanced', name: 'Advanced', difficulty: 'Pro', color: '#ef4444', desc: 'Full-stack + Docker + CI/CD + tests. Production-level code.', experience: '2+ years experience' }
+  { id: 'beginner', name: 'Beginner', difficulty: 'Easy', color: '#22c55e', desc: 'Python & ML fundamentals. No prior experience needed.', experience: '0 - 6 months experience' },
+  { id: 'intermediate', name: 'Intermediate', difficulty: 'Recommended', color: '#f59e0b', desc: 'Scikit-Learn, PyTorch, EDA. Build end-to-end models.', experience: '6 months - 2 years' },
+  { id: 'advanced', name: 'Advanced', difficulty: 'Pro', color: '#ef4444', desc: 'Deep Learning, NLP, Docker, FastAPI deployment.', experience: '2+ years experience' }
 ];
 
 export default function InternshipEnroll() {
   const navigate = useNavigate();
-  const [isEnrolled, setIsEnrolled] = useState(false); // start as unenrolled to trigger the gorgeous setup flow
+  const [isEnrolled, setIsEnrolled] = useState(false);
   
   // Setup Wizard States
   const [step, setStep] = useState(1);
-  const [selectedPlan, setSelectedPlan] = useState(plans[2]); // Standard 30 days default
-  const [selectedTrack, setSelectedTrack] = useState(tracks[0]); // Web dev default
+  const [selectedPlan, setSelectedPlan] = useState(plans[1]); // 15 days default
+  const [selectedTrack, setSelectedTrack] = useState(tracks[0]); // AI/ML default
   const [selectedLevel, setSelectedLevel] = useState(levels[1]); // Intermediate default
   
   // Checkout Details States
@@ -45,23 +46,30 @@ export default function InternshipEnroll() {
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   // Completed Enrollment Details View States
-  const [activeEnrolledTrack, setActiveEnrolledTrack] = useState('webdev');
+  const [activeEnrolledTrack, setActiveEnrolledTrack] = useState('aiml');
   const [activeEnrolledLevel, setActiveEnrolledLevel] = useState('intermediate');
 
-  const handleCompleteEnrollment = () => {
+  const handleCompleteEnrollment = async () => {
     setIsProcessing(true);
-    // Simulate high-end processing delay
+    try {
+      await internshipApi.enroll({
+        track_id: selectedTrack.id,
+        plan_id: selectedPlan.id,
+        difficulty_level: selectedLevel.id
+      });
+    } catch (err) {
+      console.error('Enroll error:', err);
+    }
     setTimeout(() => {
       setIsProcessing(false);
       setPaymentSuccess(true);
-      // Let success modal hold for 1.5 seconds, then flip status and navigate
       setTimeout(() => {
         setIsEnrolled(true);
         setPaymentSuccess(false);
-        setStep(1); // Reset state for next visit
+        setStep(1);
         navigate('/internship');
-      }, 2000);
-    }, 2500);
+      }, 1500);
+    }, 1500);
   };
 
   // If already enrolled, render the active dashboard control view (Specialization Changer & Level Config)

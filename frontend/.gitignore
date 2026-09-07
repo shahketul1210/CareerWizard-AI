@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Run Backend: cd backend && .\venv\Scripts\activate && uvicorn main:app --reload
+# Run Frontend: cd frontend && npm run dev
+# Backend URL:  http://127.0.0.1:8000 (Docs: /docs)
+# Frontend URL: http://localhost:5173

@@ -388,6 +388,14 @@ def seed_database(force=False):
         db.commit()
         print(f"User activities seeded: {db.query(UserActivity).count()}")
 
+        # 11. Seed AI/ML Internship Track (15 Days)
+        try:
+            from app.db.seed_aiml_internship import seed_aiml_data
+            seed_aiml_data()
+            print("AI/ML Internship 15-day track seeded successfully!")
+        except Exception as intern_err:
+            print(f"Note on seeding AI/ML internship: {intern_err}")
+
         print("Database seeding completed successfully for main1!")
     finally:
         db.close()

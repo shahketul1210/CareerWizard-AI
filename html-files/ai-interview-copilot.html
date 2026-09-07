@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Copilot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFE8D8;
+    --paper:#FBF7EC;
+    --ink:#2B2419;
+    --ink-soft:#6E624C;
+    --accent:#8A6A32;
+    --accent-soft:#C9AE7C;
+    --line:#E3D8BE;
+    --interviewer-bubble:#FFFFFF;
+    --student-bubble:#DCEFC7;
+    --student-bubble-border:#C4E1A6;
+    --tick-blue:#4FA3D1;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'EB Garamond', Garamond, 'Times New Roman', serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .app{
+    max-width:760px;
+    margin:0 auto;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--paper);
+    border-left:1px solid var(--line);
+    border-right:1px solid var(--line);
+    box-shadow:0 0 40px rgba(60,45,20,0.08);
+  }
+
+  header{
+    padding:30px 44px 22px;
+    border-bottom:1px solid var(--line);
+    background:var(--paper);
+  }
+  .brandline{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:16px;
+  }
+  h1{
+    font-size:28px;
+    font-weight:600;
+    letter-spacing:0.2px;
+    margin:0;
+    color:var(--ink);
+  }
+  .status-pill{
+    font-size:14px;
+    font-style:italic;
+    color:var(--ink-soft);
+    white-space:nowrap;
+  }
+  .status-pill.live{color:#4C8A3F;}
+
+  .setup{
+    padding:6px 44px 40px;
+    border-bottom:1px solid var(--line);
+  }
+  .setup p.lede{
+    font-size:18px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:56ch;
+    margin:0 0 26px;
+  }
+  .field{ margin-bottom:18px; }
+  .field label{
+    display:block;
+    font-size:15px;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .field input, .field select, .field textarea{
+    width:100%;
+    font-family:inherit;
+    font-size:17px;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:11px 13px;
+  }
+  .field textarea{resize:vertical; min-height:64px;}
+  .field input:focus, .field select:focus, .field textarea:focus{
+    outline:none;
+    border-color:var(--accent-soft);
+  }
+  .field-row{display:flex; gap:16px;}
+  .field-row .field{flex:1;}
+
+  .begin-btn{
+    margin-top:6px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    font-family:inherit;
+    font-size:17px;
+    letter-spacing:0.3px;
+    padding:13px 28px;
+    border-radius:8px;
+    cursor:pointer;
+    transition:background 0.15s ease;
+  }
+  .begin-btn:hover{background:var(--accent);}
+  .begin-btn:disabled{background:#B8AC91; cursor:default;}
+
+  /* ---------- Transcript (WhatsApp-style) ---------- */
+  .transcript{
+    flex:1;
+    padding:28px 30px;
+    overflow-y:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    background-image: radial-gradient(var(--line) 0.6px, transparent 0.6px);
+    background-size: 18px 18px;
+    background-color: var(--bg);
+  }
+  .day-chip{
+    align-self:center;
+    background:#fff;
+    color:var(--ink-soft);
+    font-size:13px;
+    font-style:italic;
+    padding:4px 14px;
+    border-radius:20px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.08);
+    margin:6px 0 10px;
+  }
+  .msg{
+    display:flex;
+    flex-direction:column;
+    max-width:78%;
+    position:relative;
+  }
+  .msg.interviewer{align-self:flex-start;}
+  .msg.student{align-self:flex-end; align-items:flex-end;}
+
+  .msg .role{
+    font-size:12.5px;
+    color:var(--accent);
+    font-weight:600;
+    margin-bottom:2px;
+    padding:0 4px;
+  }
+  .msg.student .role{color:#4C8A3F;}
+
+  .bubble{
+    padding:9px 12px 8px;
+    border-radius:var(--radius);
+    font-size:17px;
+    line-height:1.55;
+    box-shadow:0 1px 1.5px rgba(0,0,0,0.08);
+    position:relative;
+  }
+  .msg.interviewer .bubble{
+    background:var(--interviewer-bubble);
+    border-top-left-radius:2px;
+  }
+  .msg.student .bubble{
+    background:var(--student-bubble);
+    border:1px solid var(--student-bubble-border);
+    border-top-right-radius:2px;
+  }
+  .meta{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:3px;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:3px;
+    opacity:0.85;
+  }
+  .meta .tick{color:var(--tick-blue); font-size:13px; line-height:1;}
+
+  .typing-bubble{
+    align-self:flex-start;
+    background:var(--interviewer-bubble);
+    border-radius:var(--radius);
+    border-top-left-radius:2px;
+    padding:11px 16px;
+    box-shadow:0 1px 1.5px rgba(0,0,0,0.08);
+    display:flex;
+    gap:4px;
+    align-items:center;
+  }
+  .typing-bubble.student-side{
+    align-self:flex-end;
+    background:var(--student-bubble);
+    border:1px solid var(--student-bubble-border);
+    border-top-right-radius:2px;
+    border-top-left-radius:var(--radius);
+  }
+  .typing-bubble span{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--ink-soft);
+    opacity:0.5;
+    animation: bounce 1.1s infinite ease-in-out;
+  }
+  .typing-bubble span:nth-child(2){animation-delay:0.15s;}
+  .typing-bubble span:nth-child(3){animation-delay:0.3s;}
+  @keyframes bounce{
+    0%, 60%, 100%{transform:translateY(0); opacity:0.4;}
+    30%{transform:translateY(-4px); opacity:0.9;}
+  }
+
+  .verdict{
+    margin:14px auto 6px;
+    max-width:94%;
+    padding:20px 24px;
+    border:1px solid var(--accent-soft);
+    background:#FBF6E9;
+    border-radius:10px;
+    box-shadow:0 1px 2px rgba(0,0,0,0.08);
+  }
+  .verdict h3{
+    margin:0 0 10px;
+    font-size:19px;
+    font-weight:600;
+    color:var(--accent);
+  }
+  .verdict p{margin:0 0 8px; font-size:16.5px; line-height:1.6; color:var(--ink);}
+  .verdict p:last-child{margin-bottom:0;}
+
+  .footer-row{
+    border-top:1px solid var(--line);
+    padding:18px 44px 24px;
+    display:flex;
+    justify-content:center;
+  }
+  .restart-btn{
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    font-family:inherit;
+    font-size:16px;
+    padding:11px 24px;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  .restart-btn:hover{background:var(--accent);}
+
+  ::-webkit-scrollbar{width:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--line); border-radius:6px;}
+
+  .hidden{display:none !important;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="brandline">
+      <h1>Interview Copilot</h1>
+      <span class="status-pill" id="statusPill">not started</span>
+    </div>
+  </header>
+
+  <section class="setup" id="setupPanel">
+    <p class="lede">Watch a full, realistic mock interview play out start to finish — an AI interviewer and an AI candidate, conversing like a real chat, end to end.</p>
+
+    <div class="field">
+      <label for="roleInput">Role / position being interviewed for</label>
+      <input type="text" id="roleInput" placeholder="e.g. Computer Engineering internship, Backend Developer, GATE viva" value="Computer Engineering internship candidate">
+    </div>
+
+    <div class="field-row">
+      <div class="field">
+        <label for="levelInput">Level</label>
+        <select id="levelInput">
+          <option>Student / Fresher</option>
+          <option>Internship</option>
+          <option>Entry-level</option>
+          <option>Experienced</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="styleInput">Interview style</label>
+        <select id="styleInput">
+          <option>Balanced (technical + HR)</option>
+          <option>Purely technical</option>
+          <option>Purely HR / behavioural</option>
+          <option>Viva / academic</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="focusInput">Anything specific the interviewer should focus on (optional)</label>
+      <textarea id="focusInput" placeholder="e.g. DBMS, OOP, my societal internship project, resume questions"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="candidateInput">Who is the dummy candidate? (optional)</label>
+      <input type="text" id="candidateInput" placeholder="e.g. a final-year Computer Engineering student, slightly nervous but well-prepared">
+    </div>
+
+    <button class="begin-btn" id="beginBtn">Start interview</button>
+  </section>
+
+  <div class="transcript hidden" id="transcript"></div>
+
+  <div class="footer-row hidden" id="footerRow">
+    <button class="restart-btn" id="restartBtn">Run another interview</button>
+  </div>
+
+</div>
+
+<script>
+const setupPanel = document.getElementById('setupPanel');
+const transcriptEl = document.getElementById('transcript');
+const footerRow = document.getElementById('footerRow');
+const beginBtn = document.getElementById('beginBtn');
+const restartBtn = document.getElementById('restartBtn');
+const statusPill = document.getElementById('statusPill');
+
+let history = []; // {role: 'user'|'assistant', content: string} — assistant = interviewer, user = candidate
+let ended = false;
+
+function timeNow(){
+  const d = new Date();
+  let h = d.getHours(), m = d.getMinutes();
+  const ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12; if(h === 0) h = 12;
+  return h + ':' + String(m).padStart(2,'0') + ' ' + ampm;
+}
+
+function addDayChip(){
+  const chip = document.createElement('div');
+  chip.className = 'day-chip';
+  chip.textContent = 'Today';
+  transcriptEl.appendChild(chip);
+}
+
+function addMessage(role, text){
+  const wrap = document.createElement('div');
+  wrap.className = 'msg ' + (role === 'assistant' ? 'interviewer' : 'student');
+
+  const label = document.createElement('div');
+  label.className = 'role';
+  label.textContent = role === 'assistant' ? 'Interviewer' : 'Candidate';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = text || '';
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.innerHTML = '<span class="time"></span>';
+
+  wrap.appendChild(label);
+  wrap.appendChild(bubble);
+  wrap.appendChild(meta);
+  transcriptEl.appendChild(wrap);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  return { bubble, meta };
+}
+
+function finalizeMessage(meta, role){
+  const timeSpan = meta.querySelector('.time');
+  timeSpan.textContent = timeNow();
+  if(role === 'user'){
+    const tick = document.createElement('span');
+    tick.className = 'tick';
+    tick.textContent = '✓✓';
+    meta.appendChild(tick);
+  }
+}
+
+function addTypingBubble(side){
+  const t = document.createElement('div');
+  t.className = 'typing-bubble' + (side === 'user' ? ' student-side' : '');
+  t.id = 'typingBubble';
+  t.innerHTML = '<span></span><span></span><span></span>';
+  transcriptEl.appendChild(t);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+}
+function removeTypingBubble(){
+  const t = document.getElementById('typingBubble');
+  if(t) t.remove();
+}
+
+function buildSystemPrompt(){
+  const role = document.getElementById('roleInput').value.trim() || 'a general professional role';
+  const level = document.getElementById('levelInput').value;
+  const style = document.getElementById('styleInput').value;
+  const focus = document.getElementById('focusInput').value.trim();
+  return `You are a senior, professional interviewer conducting a live mock interview for the role/context: "${role}".
+Candidate level: ${level}. Interview style requested: ${style}.
+${focus ? 'Specific focus areas requested by the candidate: ' + focus + '.' : ''}
+
+Rules:
+- Ask exactly one question at a time. Never ask multiple questions in one turn.
+- Keep your own turns concise (2-5 sentences): a brief, natural reaction to their previous answer (only if one exists), then one clear question.
+- Sound like a real, courteous human interviewer — warm but professional, no excessive praise, no emojis, no markdown formatting, plain prose only.
+- Start with a short greeting and your first question.
+- Progress logically: opening/background, then core technical or role-specific questions, then a couple of harder or scenario questions, then close with a chance for the candidate to ask you something.
+- Adapt difficulty based on how well they're answering.
+- Do not break character or mention that you are an AI unless directly asked.
+- This is a short, time-boxed mock interview of about 5 minutes: plan for roughly 6 questions total, then move toward closing.`;
+}
+
+function buildCandidateSystemPrompt(){
+  const role = document.getElementById('roleInput').value.trim() || 'a general professional role';
+  const level = document.getElementById('levelInput').value;
+  const who = document.getElementById('candidateInput').value.trim();
+  return `You are the candidate in a mock interview for: "${role}" (level: ${level}).
+${who ? 'Persona: ' + who + '.' : 'Persona: a genuine, reasonably well-prepared candidate — not perfect, occasionally pauses to think, gives specific, believable, human answers with real-sounding examples.'}
+
+Rules:
+- Answer only the interviewer's most recent question, in first person, like a real person speaking in an interview — natural sentence rhythm, no markdown, no bullet points, no emojis.
+- Keep answers concise and conversational: 2-5 sentences, occasionally a bit longer for a technical or "tell me about a time" question.
+- Be specific and concrete rather than generic. Invent believable small details (project names, numbers, situations) consistent with the persona rather than saying "I don't have experience."
+- Show a touch of realistic personality — mild nerves, honesty about a weakness when asked, genuine enthusiasm where it fits — but stay professional throughout.
+- If asked "do you have any questions for me", ask one genuine, sensible question, then stop.
+- Never break character or mention you are an AI.`;
+}
+
+// Streams the model's reply token-by-token so text starts appearing
+// almost immediately instead of waiting for the full response.
+async function streamModel(systemPrompt, messages, onDelta){
+  const response = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: messages,
+      stream: true
+    })
+  });
+
+  if(!response.ok){
+    const errText = await response.text().catch(()=> '');
+    throw new Error('API error ' + response.status + ': ' + errText.slice(0,200));
+  }
+
+  if(!response.body){
+    const data = await response.json();
+    const textBlock = (data.content || []).find(b => b.type === 'text');
+    const full = textBlock ? textBlock.text : '';
+    onDelta(full);
+    return full;
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let fullText = '';
+
+  while(true){
+    const { done, value } = await reader.read();
+    if(done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split('\n');
+    buffer = lines.pop();
+    for(const line of lines){
+      const trimmed = line.trim();
+      if(!trimmed.startsWith('data:')) continue;
+      const jsonStr = trimmed.slice(5).trim();
+      if(!jsonStr || jsonStr === '[DONE]') continue;
+      try{
+        const evt = JSON.parse(jsonStr);
+        if(evt.type === 'content_block_delta' && evt.delta && typeof evt.delta.text === 'string'){
+          fullText += evt.delta.text;
+          onDelta(fullText);
+        }
+      }catch(e){ /* ignore partial/malformed chunks */ }
+    }
+  }
+  return fullText;
+}
+
+// Shows a typing indicator, then streams the reply live into a real bubble.
+async function streamTurn(role, sys, msgs){
+  addTypingBubble(role);
+  let created = false;
+  let refs = null;
+  try{
+    const full = await streamModel(sys, msgs, (partial) => {
+      if(!created){
+        removeTypingBubble();
+        refs = addMessage(role, '');
+        created = true;
+      }
+      refs.bubble.textContent = partial;
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    });
+    if(!created){
+      removeTypingBubble();
+      refs = addMessage(role, full || '…');
+    }
+    finalizeMessage(refs.meta, role);
+    return full;
+  }catch(err){
+    removeTypingBubble();
+    const refsErr = addMessage(role, "Sorry — I couldn't reach the interview service just now. Please check your connection and try again.");
+    finalizeMessage(refsErr.meta, role);
+    throw err;
+  }
+}
+
+// Converts our transcript's roles into the *other* party's point of view.
+// Our history is always {role:'assistant'} = interviewer, {role:'user'} = candidate.
+function flipRoles(msgs){
+  return msgs.map(m => ({ role: m.role === 'assistant' ? 'user' : 'assistant', content: m.content }));
+}
+
+async function runInterview(){
+  setupPanel.classList.add('hidden');
+  transcriptEl.classList.remove('hidden');
+  transcriptEl.innerHTML = '';
+  footerRow.classList.add('hidden');
+  history = [];
+  ended = false;
+  addDayChip();
+  statusPill.textContent = 'in progress';
+  statusPill.classList.add('live');
+
+  const interviewerSys = buildSystemPrompt();
+  const candidateSys = buildCandidateSystemPrompt();
+  const ROUNDS = 6;
+
+  try{
+    let reply = await streamTurn('assistant', interviewerSys, [{role:'user', content:'Please begin the interview now.'}]);
+    history.push({role:'assistant', content: reply});
+
+    for(let i = 0; i < ROUNDS; i++){
+      const candidateReply = await streamTurn('user', candidateSys, flipRoles(history));
+      history.push({role:'user', content: candidateReply});
+
+      const isLast = i === ROUNDS - 1;
+      const interviewerReply = await streamTurn(
+        'assistant',
+        isLast ? interviewerSys + '\n\nThis was the final question — now wrap up warmly and close the conversation in this turn, without asking anything further.' : interviewerSys,
+        history
+      );
+      history.push({role:'assistant', content: interviewerReply});
+    }
+
+    await showFeedback(interviewerSys);
+  }catch(err){
+    statusPill.textContent = 'connection issue';
+    statusPill.classList.remove('live');
+    footerRow.classList.remove('hidden');
+  }
+}
+
+async function showFeedback(interviewerSys){
+  ended = true;
+  statusPill.textContent = 'finished';
+  statusPill.classList.remove('live');
+
+  const feedbackSys = interviewerSys + `
+
+The interview is now ending. Do not ask any further questions. Instead, write a short closing note thanking the candidate, followed by brief structured feedback: 2-3 strengths, 2-3 areas to improve, and one overall verdict sentence. Keep it plain prose, no markdown symbols.`;
+
+  const verdict = document.createElement('div');
+  verdict.className = 'verdict';
+  verdict.innerHTML = '<h3>Interviewer\'s feedback</h3><p></p>';
+  transcriptEl.appendChild(verdict);
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+
+  try{
+    const reply = await streamModel(feedbackSys, [...history, {role:'user', content:'Please give your closing feedback now.'}], (partial) => {
+      verdict.innerHTML = '<h3>Interviewer\'s feedback</h3>' + partial.split('\n').filter(l=>l.trim()).map(l=>'<p>'+l.trim()+'</p>').join('');
+      transcriptEl.scrollTop = transcriptEl.scrollHeight;
+    });
+    verdict.innerHTML = '<h3>Interviewer\'s feedback</h3>' + reply.split('\n').filter(l=>l.trim()).map(l=>'<p>'+l.trim()+'</p>').join('');
+  }catch(err){
+    verdict.innerHTML = '<h3>Interviewer\'s feedback</h3><p>Could not generate feedback right now — please try running the interview again.</p>';
+  }
+  transcriptEl.scrollTop = transcriptEl.scrollHeight;
+  footerRow.classList.remove('hidden');
+}
+
+function resetToSetup(){
+  setupPanel.classList.remove('hidden');
+  transcriptEl.classList.add('hidden');
+  footerRow.classList.add('hidden');
+  statusPill.textContent = 'not started';
+  statusPill.classList.remove('live');
+}
+
+beginBtn.addEventListener('click', runInterview);
+restartBtn.addEventListener('click', resetToSetup);
+</script>
+</body>
+</html>
